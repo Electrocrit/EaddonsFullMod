@@ -1,4 +1,4 @@
-package com.github.nolanb47.eaddonsfullmod.mixin;
+package com.eaddons.mixin;
 
 import net.minecraft.client.gui.GuiMainMenu;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,4 +1,5 @@
 import org.apache.commons.lang3.SystemUtils
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.include
 
 plugins {
     idea
@@ -28,6 +29,8 @@ loom {
         "client" {
             // If you don't want mixins, remove these lines
             property("mixin.debug", "true")
+            property("asmhelper.verbose", "true")
+            arg("--tweakClass", "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker")
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
         }
     }
@@ -62,6 +65,8 @@ repositories {
     maven("https://repo.spongepowered.org/maven/")
     // If you don't want to log in with your real minecraft account, remove this line
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+    maven("https://repo.essential.gg/repository/maven-public/")
+    maven("https://repo.polyfrost.cc/releases")
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -72,8 +77,9 @@ dependencies {
     minecraft("com.mojang:minecraft:1.8.9")
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
-
-    // If you don't want mixins, remove these lines
+    compileOnly("cc.polyfrost:oneconfig-1.8.9-forge:0.2.0-alpha+") // Should not be included in jar
+    // include should be replaced with a configuration that includes this in the jar
+    shadowImpl("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta+") // Should be included in jar
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
     }
@@ -97,7 +103,7 @@ tasks.withType(Jar::class) {
         this["ForceLoadAsMod"] = "true"
 
         // If you don't want mixins, remove these lines
-        this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
+        this["TweakClass"] = "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker"
         this["MixinConfigs"] = "mixins.$modid.json"
     }
 }
@@ -136,9 +142,9 @@ tasks.shadowJar {
             println("Copying jars into mod: ${it.files}")
         }
     }
-
     // If you want to include other dependencies and shadow them, you can relocate them in here
     fun relocate(name: String) = relocate(name, "$baseGroup.deps.$name")
+
 }
 
 tasks.assemble.get().dependsOn(tasks.remapJar)

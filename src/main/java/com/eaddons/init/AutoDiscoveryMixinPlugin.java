@@ -1,4 +1,4 @@
-package com.github.nolanb47.eaddonsfullmod.init;
+package com.eaddons.init;
 
 import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
